@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en"> <!-- 声明 HTML 文档类型为 HTML5，设置语言为英语 -->
+  <head>
+    <meta charset="utf-8" /> <!-- 设置文档的字符编码为 UTF-8 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- 设置视口，确保页面在移动设备上正常显示 -->
+
+    <title>Sketch</title> <!-- 设置网页标题 -->
+
+    <link rel="stylesheet" type="text/css" href="style.css"> <!-- 引入外部样式表 -->
+
+    <script src="libraries/p5.min.js"></script> <!-- 引入 p5.js 库 -->
+    <script src="libraries/p5.sound.min.js"></script> <!-- 引入 p5.sound 库 -->
+    <style>
+      /* 內嵌頁面的樣式 */
+      #popup, #quiz-popup, #video-popup, #notes-popup {
+        display: none; /* 預設隱藏 */
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        border: 1px solid #ccc;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+      }
+      #popup-overlay {
+        display: none; /* 預設隱藏 */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+      }
+      #popup button, #quiz-popup button, #video-popup button, #notes-popup button {
+        margin-top: 10px;
+      }
+      #video-popup iframe {
+        width: 100%;
+        height: 315px;
+      }
+      #video-popup video {
+        width: 80%; /* 縮小影片寬度 */
+        height: auto; /* 自動調整高度 */
+      }
+    </style>
+  </head>
+
+  <body>
+    <ul class="menu"> <!-- 创建一个菜单，使用 ul 和 li 元素 -->
+      <li>首頁</li> <!-- 菜单项：首頁 -->
+      <li id="about-me-btn">自我介紹</li> <!-- 添加 id 以便綁定事件 -->
+      <li id="notes-btn">筆記</li> <!-- 新增按鈕：筆記 -->
+      <li>
+        作品集 <!-- 菜单项：作品集 -->
+        <ul class="submenu"> <!-- 子菜单 -->
+          <li><a href="https://yuyucen.github.io/20221012/" target="_blank">作業一</a></li> <!-- 子菜单项：作业一 -->
+          <li><a href="https://yuyucen.github.io/20250303/" target="_blank">作業二</a></li> <!-- 子菜单项：作业二 -->
+          <li><a href="https://yuyucen.github.io/20250310_1/" target="_blank">作業三</a></li> <!-- 子菜单项：作业三 -->
+          <li><a href="https://yuyucen.github.io/2025031702/" target="_blank">作業四</a></li> <!-- 子菜单项：作业四 -->
+        </ul>
+      </li>
+      <li id="quiz-btn">測驗卷</li> <!-- 菜单项：測验卷 -->
+      <li id="video-btn">教學影片</li> <!-- 菜单项：教学影片 -->
+    </ul>
+
+    <!-- 自我介紹內嵌頁面 -->
+    <div id="popup-overlay"></div>
+    <div id="popup">
+      <p>408730777 較科系4a 簡岑昱</p>
+      <button onclick="closePopup()">關閉</button>
+    </div>
+    <!-- 筆記內嵌頁面 -->
+    <div id="notes-popup">
+      <iframe src="https://hackmd.io/@O7lQt3oVR5yGW7sq0IKidw/ByHyx5f1lx" width="100%" height="400px" frameborder="0"></iframe>
+      <button onclick="closeNotesPopup()">關閉</button>
+    </div>
+    <!-- 測驗卷內嵌頁面 -->
+    <div id="quiz-popup">
+      <div id="quiz-content"></div>
+      <button onclick="closeQuizPopup()">關閉</button>
+    </div>
+    <!-- 教學影片內嵌頁面 -->
+    <div id="video-popup">
+      <video controls>
+        <source src="https://cfchen58.synology.me/%E7%A8%8B%E5%BC%8F%E8%A8%AD%E8%A8%882024/B2/week1/20250217_092821.mp4" type="video/mp4">
+        您的瀏覽器不支援影片播放。
+      </video>
+      <button onclick="closeVideoPopup()">關閉</button>
+    </div>
+
+    <script>
+      // 自我介紹彈出視窗
+      const aboutMeBtn = document.getElementById('about-me-btn');
+      const popup = document.getElementById('popup');
+      const popupOverlay = document.getElementById('popup-overlay');
+
+      aboutMeBtn.addEventListener('click', () => {
+        popup.style.display = 'block';
+        popupOverlay.style.display = 'block';
+      });
+
+      function closePopup() {
+        popup.style.display = 'none';
+        popupOverlay.style.display = 'none';
+      }
+
+      // 筆記彈出視窗
+      const notesBtn = document.getElementById('notes-btn');
+      const notesPopup = document.getElementById('notes-popup');
+
+      notesBtn.addEventListener('click', () => {
+        notesPopup.style.display = 'block';
+        popupOverlay.style.display = 'block';
+      });
+
+      function closeNotesPopup() {
+        notesPopup.style.display = 'none';
+        popupOverlay.style.display = 'none';
+      }
+
+      // 測驗卷彈出視窗
+      const quizBtn = document.getElementById('quiz-btn');
+      const quizPopup = document.getElementById('quiz-popup');
+      const quizContent = document.getElementById('quiz-content');
+
+      const questions = [
+        { question: "地球有幾個大洲？", options: ["5", "6", "7"], answer: "7" },
+        { question: "太陽是什麼類型的天體？", options: ["行星", "恆星", "衛星"], answer: "恆星" },
+        { question: "水的化學式是什麼？", options: ["H2O", "CO2", "O2"], answer: "H2O" },
+        { question: "一年有幾個月？", options: ["10", "12", "14"], answer: "12" },
+        { question: "人類有幾條腿？", options: ["1", "2", "3"], answer: "2" }
+      ];
+
+      quizBtn.addEventListener('click', () => {
+        quizContent.innerHTML = ""; // 清空內容
+        const selectedQuestions = questions.sort(() => 0.5 - Math.random()).slice(0, 3); // 隨機選擇3題
+
+        selectedQuestions.forEach((q, index) => {
+          const questionDiv = document.createElement("div");
+          questionDiv.innerHTML = `<p>${index + 1}. ${q.question}</p>`;
+          q.options.forEach(option => {
+            const optionBtn = document.createElement("button");
+            optionBtn.textContent = option;
+            optionBtn.onclick = () => {
+              if (option === q.answer) {
+                alert("答對了");
+              } else {
+                alert("答錯了");
+              }
+            };
+            questionDiv.appendChild(optionBtn);
+          });
+          quizContent.appendChild(questionDiv);
+        });
+
+        quizPopup.style.display = 'block';
+        popupOverlay.style.display = 'block';
+      });
+
+      function closeQuizPopup() {
+        quizPopup.style.display = 'none';
+        popupOverlay.style.display = 'none';
+      }
+
+      // 教學影片彈出視窗
+      const videoBtn = document.getElementById('video-btn');
+      const videoPopup = document.getElementById('video-popup');
+
+      videoBtn.addEventListener('click', () => {
+        videoPopup.style.display = 'block';
+        popupOverlay.style.display = 'block';
+      });
+
+      function closeVideoPopup() {
+        videoPopup.style.display = 'none';
+        popupOverlay.style.display = 'none';
+      }
+    </script>
+    <script src="sketch.js"></script> <!-- 引入 sketch.js 文件 -->
+  </body>
+</html>
